@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ stock.name }} - StockTokens</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        line-height: 1.6;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Light Theme (Default) */
+      :root {
+        --bg-primary: #f5f7fa;
+        --bg-secondary: #e5e7eb;
+        --card-bg: #ffffff;
+        --text-primary: #2e2e2e;
+        --text-secondary: #6b7280;
+        --primary-color: #2d3a8c;
+        --accent-color: #00bfa6;
+        --success-color: #16a34a;
+        --danger-color: #dc2626;
+        --border-color: #e5e7eb;
+        --navbar-bg: #2d3a8c;
+        --navbar-text: #ffffff;
+        --button-hover-bg: #1f2a69;
+        --disabled-color: #d1d5db;
+        --card-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+        --gradient: linear-gradient(135deg, #2d3a8c, #00bfa6);
+      }
+
+      /* Dark Theme */
+      body.dark-theme {
+        --bg-primary: #1f2a44;
+        --bg-secondary: #374151;
+        --card-bg: #2d3748;
+        --text-primary: #e5e7eb;
+        --text-secondary: #9ca3af;
+        --primary-color: #3b82f6;
+        --accent-color: #10b981;
+        --success-color: #22c55e;
+        --danger-color: #ef4444;
+        --border-color: #4b5563;
+        --navbar-bg: #1e3a8a;
+        --navbar-text: #e5e7eb;
+        --button-hover-bg: #60a5fa;
+        --disabled-color: #6b7280;
+        --card-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+        --gradient: linear-gradient(135deg, #3b82f6, #10b981);
+      }
+
+      /* Navbar */
+      .navbar {
+        padding: 1rem 0;
+        background: var(--gradient);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--navbar-text) !important;
+      }
+
+      .navbar-nav .nav-link {
+        color: var(--navbar-text) !important;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .navbar-nav .nav-link:hover,
+      .navbar-nav .nav-link.active {
+        color: #d1d5db !important;
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1400px;
+        padding: -1rem 1rem;
+        color: var(--text-primary);
+      }
+
+      /* Headings */
+      h1,
+      h2,
+      h3,
+      h5 {
+        font-weight: 600;
+      }
+
+      h1 {
+        font-size: 2.25rem;
+        margin-bottom: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      h5 {
+        font-size: 1.25rem;
+      }
+
+      /* Cards */
+      .card {
+        background-color: var(--card-bg);
+        border: none;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      .card-header {
+        background: var(--gradient);
+        color: var(--navbar-text);
+        border-radius: 12px 12px 0 0;
+        padding: 1rem;
+      }
+
+      /* Tables */
+      .table {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0;
+      }
+
+      .table th {
+        font-weight: 600;
+        color: var(--text-primary);
+        background-color: var(--bg-secondary);
+        padding: 1rem;
+      }
+
+      .table td {
+        color: var(--text-primary);
+        padding: 1rem;
+        vertical-align: middle;
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: var(--bg-secondary);
+      }
+
+      .table-success {
+        background-color: rgba(22, 163, 74, 0.1) !important;
+      }
+
+      .table-danger {
+        background-color: rgba(220, 38, 38, 0.1) !important;
+      }
+
+      /* Badges */
+      .badge {
+        font-size: 0.85rem;
+        padding: 0.5em 0.8em;
+        border-radius: 6px;
+      }
+
+      .bg-success {
+        background-color: var(--success-color) !important;
+      }
+
+      .bg-danger {
+        background-color: var(--danger-color) !important;
+      }
+
+      /* Form Elements */
+      .form-control,
+      .form-select {
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+        font-size: 1rem;
+        background-color: var(--card-bg);
+        color: var(--text-primary);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(45, 58, 140, 0.25);
+        outline: none;
+      }
+
+      .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      /* Buttons */
+      .btn {
+        font-weight: 500;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .btn-primary:hover {
+        background-color: var(--button-hover-bg);
+        border-color: var(--button-hover-bg);
+        transform: translateY(-2px);
+      }
+
+      .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        color: var(--navbar-text);
+        transform: translateY(-2px);
+      }
+
+      /* Theme Toggle Button */
+      .theme-toggle {
+        margin-left: 1rem;
+      }
+
+      .theme-toggle .btn {
+        border-radius: 50%;
+        padding: 0.5rem;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .theme-toggle .btn:hover {
+        background-color: var(--bg-secondary);
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      /* Footer */
+      footer {
+        background-color: var(--bg-secondary);
+        color: var(--text-secondary);
+        padding: 1.5rem 0;
+        margin-top: 2rem;
+      }
+
+      footer p {
+        font-size: 0.9rem;
+      }
+
+      /* Chart Canvas */
+      canvas {
+        max-width: 100%;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 1.75rem;
+        }
+
+        h2 {
+          font-size: 1.25rem;
+        }
+
+        h5 {
+          font-size: 1.1rem;
+        }
+
+        .card-body {
+          padding: 1rem;
+        }
+
+        .table th,
+        .table td {
+          padding: 0.75rem;
+          font-size: 0.9rem;
+        }
+
+        .form-control,
+        .form-select {
+          font-size: 0.9rem;
+          padding: 0.6rem;
+        }
+
+        .btn {
+          padding: 0.4rem 0.8rem;
+          font-size: 0.9rem;
+        }
+
+        .badge {
+          font-size: 0.75rem;
+        }
+      }
+      .price-card {
+        transition: all 0.3s ease;
+      }
+
+      .price-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .chart-container {
+        position: relative;
+      }
+
+      .chart-type-toggle {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 10;
+      }
+
+      #candlestickChart {
+        cursor: grab;
+      }
+
+      #candlestickChart:active {
+        cursor: grabbing;
+      }
+
+      .token-info {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+      }
+
+      .company-overview {
+        margin-bottom: 20px;
+      }
+
+      .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+      }
+
+      .historical-data-table {
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('index') }}">StockTokens</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('dashboard') }}"
+                >Dashboard</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('market') }}">Market</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('portfolio') }}"
+                >Portfolio</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('buy') }}">Buy</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('sell') }}">Sell</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('transactions') }}"
+                >Transactions</a
+              >
+            </li>
+          </ul>
+          <div class="navbar-nav">
+            <span class="nav-item nav-link text-light"
+              >Balance: ₹{{ "{:.2f}".format(current_user.balance) }}</span
+            >
+            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{{ url_for('market') }}">Market</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            {{ stock.name }}
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Stock Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="mb-0">
+            {{ stock.name }}
+            <span class="text-muted">({{ stock.symbol }})</span>
+          </h1>
+          <p class="text-muted mb-0">{{ stock.sector }}</p>
+        </div>
+        <div class="text-end">
+          <h3 class="mb-0">₹{{ "{:.2f}".format(stock.full_price) }}</h3>
+          <p
+            class="mb-0 {% if stock.change_percent > 0 %}text-success{% else %}text-danger{% endif %}"
+          >
+            <i
+              class="bi bi-arrow-{% if stock.change_percent > 0 %}up{% else %}down{% endif %}"
+            ></i>
+            {{ "{:.2f}".format(stock.change_percent) }}%
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mb-4">
+        <a href="{{ url_for('buy') }}" class="btn btn-success">Buy Tokens</a>
+        {% if holding %}
+        <a href="{{ url_for('sell') }}" class="btn btn-danger">Sell Tokens</a>
+        {% endif %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary"
+          >Back to Dashboard</a
+        >
+      </div>
+
+      <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-8">
+          <!-- Chart Section -->
+          <div class="card shadow-sm mb-4">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5 class="mb-0">{{ stock.name }} Performance</h5>
+              <div class="d-flex gap-2 align-items-center">
+                <!-- Timeframe dropdown -->
+                <select
+                  id="timeframeSelect"
+                  class="form-select form-select-sm"
+                  style="width: auto"
+                >
+                  <option value="5min">5 min</option>
+                  <option value="10min">10 min</option>
+                  <option value="15min">15 min</option>
+                  <option value="60min">60 min</option>
+                  <option value="4h">4 hours</option>
+                  <option value="1D" selected>1 Day</option>
+                  <option value="1W">1 Week</option>
+                  <option value="1M">1 Month</option>
+                  <option value="1Y">1 Year</option>
+                </select>
+                <!-- Period buttons -->
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary active"
+                    data-range="1W"
+                  >
+                    1W
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-range="1M"
+                  >
+                    1M
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-range="3M"
+                  >
+                    3M
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-range="6M"
+                  >
+                    6M
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-range="1Y"
+                  >
+                    1Y
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    data-range="ALL"
+                  >
+                    ALL
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <div class="chart-type-toggle">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary" id="lineChartBtn">
+                      Line
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary active"
+                      id="candleChartBtn"
+                    >
+                      Candlestick
+                    </button>
+                    <!-- Reset zoom button -->
+                    <button class="btn btn-outline-secondary" id="resetZoomBtn">
+                      <i class="bi bi-aspect-ratio"></i> Reset
+                    </button>
+                  </div>
+                </div>
+                <div id="stockChart" style="height: 400px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Company Overview -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Company Overview</h5>
+            </div>
+            <div class="card-body">
+              <p>{{ stock.description }}</p>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Sector:</span>
+                  <span>{{ stock.sector }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>Market Cap:</span>
+                  <span
+                    >₹{{ "{:.2f}".format(stock.full_price * 1000000000) }}</span
+                  >
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>52 Week High:</span>
+                  <span>₹{{ "{:.2f}".format(stock.full_price * 1.15) }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>52 Week Low:</span>
+                  <span>₹{{ "{:.2f}".format(stock.full_price * 0.85) }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Historical Data Table -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Historical Data</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover table-sm historical-data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Open</th>
+                      <th>High</th>
+                      <th>Low</th>
+                      <th>Close</th>
+                      <th>Volume</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historicalDataTable">
+                    <!-- This will be populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-4">
+          <!-- Your Holdings Card -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Your Holdings</h5>
+            </div>
+            <div class="card-body">
+              {% if holding %}
+              <div class="mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Token Quantity:</span>
+                  <span>{{ holding.token_quantity }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Tokens Value:</span>
+                  <span
+                    >₹{{ "{:.2f}".format(holding.token_quantity *
+                    stock.token_price) }}</span
+                  >
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Profit/Loss:</span>
+                  <span
+                    class="{% if stock.change_percent > 0 %}text-success{% else %}text-danger{% endif %}"
+                  >
+                    ₹{{ "{:.2f}".format(holding.token_quantity *
+                    stock.token_price * stock.change_percent / 100) }} ({{
+                    "{:.2f}".format(stock.change_percent) }}%)
+                  </span>
+                </div>
+              </div>
+              <div class="d-grid gap-2">
+                <a href="{{ url_for('buy') }}" class="btn btn-success"
+                  >Buy More Tokens</a
+                >
+                <a href="{{ url_for('sell') }}" class="btn btn-danger"
+                  >Sell Tokens</a
+                >
+              </div>
+              {% else %}
+              <p>You don't own any tokens of this stock.</p>
+              <div class="d-grid">
+                <a href="{{ url_for('buy') }}" class="btn btn-success"
+                  >Buy Tokens</a
+                >
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Token Info Card -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Token Information</h5>
+            </div>
+            <div class="card-body">
+              <div class="token-info">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Full Share Price:</span>
+                  <span>₹{{ "{:.2f}".format(stock.full_price) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Token Count per Share:</span>
+                  <span>{{ stock.token_count }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Token Price:</span>
+                  <span>₹{{ "{:.2f}".format(stock.token_price) }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Last Updated:</span>
+                  <span
+                    >{{ stock.last_updated.strftime('%d %b %Y, %H:%M') }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Cards -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Price Overview</h5>
+            </div>
+            <div class="card-body p-2">
+              <div class="row g-2">
+                <div class="col-6">
+                  <div class="card price-card">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-subtitle mb-1 text-muted">
+                        Today's Open
+                      </h6>
+                      <h5 class="mb-0">
+                        ₹{{ "{:.2f}".format(stock.full_price * 0.99) }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card price-card">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-subtitle mb-1 text-muted">
+                        Previous Close
+                      </h6>
+                      <h5 class="mb-0">
+                        ₹{{ "{:.2f}".format(stock.full_price * 0.98) }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card price-card">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-subtitle mb-1 text-muted">Day's High</h6>
+                      <h5 class="mb-0">
+                        ₹{{ "{:.2f}".format(stock.full_price * 1.02) }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card price-card">
+                    <div class="card-body p-3 text-center">
+                      <h6 class="card-subtitle mb-1 text-muted">Day's Low</h6>
+                      <h5 class="mb-0">
+                        ₹{{ "{:.2f}".format(stock.full_price * 0.97) }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Related Stocks -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body p-0">
+              <ul class="list-group list-group-flush">
+                {% for related_stock in related_stocks %}
+                <li class="list-group-item">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <a
+                        href="{{ url_for('stock_detail', symbol=related_stock.symbol) }}"
+                        class="text-decoration-none"
+                      >
+                        {{ related_stock.name }}
+                      </a>
+                      <div class="text-muted small">
+                        {{ related_stock.symbol }}
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div>
+                        ₹{{ "{:.2f}".format(related_stock.full_price) }}
+                      </div>
+                      <div
+                        class="{% if related_stock.change_percent > 0 %}text-success{% else %}text-danger{% endif %} small"
+                      >
+                        {{ "{:.2f}".format(related_stock.change_percent) }}%
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-5">
+      <div class="container">
+        <p class="text-center text-muted mb-0">
+          © 2025 StockTokens. All rights reserved.
+        </p>
+        <p class="text-center text-muted mb-0">Mahen Chethak Devalapura</p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          let chartInstance = null;
+          let currentTimeframe = "1D";
+          let currentRange = "1W";
+          let currentChartType = "candlestick";
+          let currentSymbol = "{{ stock.symbol }}";
+
+          // Sample historical data - this would be replaced with actual data from your backend
+          const sampleHistoricalData = generateSampleData(180, {{ stock.full_price }});
+
+          // Function to generate sample stock data for demo purposes
+          function generateSampleData(days, basePrice) {
+              const data = [];
+              const today = new Date();
+
+              let currentPrice = basePrice;
+              let volatility = basePrice * 0.02; // 2% volatility
+
+              for (let i = days; i >= 0; i--) {
+                  const date = new Date(today);
+                  date.setDate(today.getDate() - i);
+
+                  // Add some randomness to create realistic price movements
+                  const open = currentPrice + (Math.random() - 0.5) * volatility;
+                  const high = open + Math.random() * volatility;
+                  const low = open - Math.random() * volatility;
+                  const close = (open + high + low) / 3 + (Math.random() - 0.5) * volatility / 2;
+
+                  // Add volume with some randomness
+                  const volume = Math.floor(1000000 + Math.random() * 9000000);
+
+                  data.push({
+                      date: formatDate(date),
+                      open: parseFloat(open.toFixed(2)),
+                      high: parseFloat(high.toFixed(2)),
+                      low: parseFloat(low.toFixed(2)),
+                      close: parseFloat(close.toFixed(2)),
+                      volume: volume
+                  });
+
+                  // Update current price for next iteration to create a trend
+                  currentPrice = close;
+              }
+
+              return data;
+          }
+
+          // Function to fetch historical data with timeframe
+          async function fetchHistoricalData(symbol, timeframe, range) {
+              // In a real application, you would fetch this data from your backend
+              // For demo purposes, we'll use the sample data
+              return filterDataByRange(sampleHistoricalData, range);
+          }
+
+          // Functions to format data
+          function formatLineData(data) {
+              return data.map(item => ({
+                  date: item.date,
+                  close: item.close
+              }));
+          }
+
+          function formatCandleData(data) {
+              return data.map(item => ({
+                  x: item.date,
+                  y: [item.open, item.high, item.low, item.close]
+              }));
+          }
+
+          // Function to render line chart
+          function renderLineChart(data, range) {
+              const filteredData = filterDataByRange(data, range);
+              const dates = filteredData.map(item => item.date);
+              const values = filteredData.map(item => item.close);
+
+              const options = {
+                  series: [
+                      {
+                          name: currentSymbol,
+                          data: values,
+                      },
+                  ],
+                  chart: {
+                      type: "area",
+                      height: 400,
+                      toolbar: {
+                          show: true,
+                          tools: {
+                              download: true,
+                              selection: true,
+                              zoom: true,
+                              zoomin: true,
+                              zoomout: true,
+                              pan: true,
+                              reset: true
+                          },
+                          autoSelected: 'zoom'
+                      },
+                      zoom: {
+                          enabled: true,
+                          type: 'xy',
+                          autoScaleYaxis: true
+                      }
+                  },
+                  dataLabels: {
+                      enabled: false,
+                  },
+                  stroke: {
+                      curve: "smooth",
+                      width: 2,
+                  },
+                  colors: ["#0d6efd"],
+                  fill: {
+                      type: "gradient",
+                      gradient: {
+                          shadeIntensity: 1,
+                          opacityFrom: 0.7,
+                          opacityTo: 0.3,
+                          stops: [0, 90, 100],
+                      },
+                  },
+                  xaxis: {
+                      categories: dates,
+                      labels: {
+                          rotate: -45,
+                          rotateAlways: false,
+                      },
+                      tickAmount: 10,
+                  },
+                  yaxis: {
+                      labels: {
+                          formatter: function (value) {
+                              return "₹" + value.toFixed(0);
+                          },
+                      },
+                      tickAmount: 7,
+                  },
+                  tooltip: {
+                      y: {
+                          formatter: function (value) {
+                              return "₹" + value.toFixed(2);
+                          },
+                      },
+                  },
+              };
+
+              // Clear existing chart
+              if (chartInstance) {
+                  chartInstance.destroy();
+              }
+
+              // Create new chart
+              chartInstance = new ApexCharts(
+                  document.getElementById("stockChart"),
+                  options
+              );
+              chartInstance.render();
+          }
+
+          // Function to render candlestick chart
+          function renderCandleChart(data, range) {
+              const filteredData = formatCandleData(filterDataByRange(data, range));
+
+              const options = {
+                  series: [{
+                      name: 'Stock Price',
+                      data: filteredData
+                  }],
+                  chart: {
+                      type: 'candlestick',
+                      height: 400,
+                      toolbar: {
+                          show: true,
+                          tools: {
+                              download: true,
+                              selection: true,
+                              zoom: true,
+                              zoomin: true,
+                              zoomout: true,
+                              pan: true,
+                              reset: true
+                          },
+                          autoSelected: 'zoom'
+                      },
+                      zoom: {
+                          enabled: true,
+                          type: 'xy',
+                          autoScaleYaxis: true
+                      }
+                  },
+                  title: {
+                      text: '{{ stock.name }} ({{ stock.symbol }})',
+                      align: 'left'
+                  },
+                  xaxis: {
+                      type: 'category',
+                      labels: {
+                          rotate: -45,
+                          rotateAlways: false,
+                      },
+                      tickAmount: 10,
+                  },
+                  yaxis: {
+                      tooltip: {
+                          enabled: true
+                      },
+                      labels: {
+                          formatter: function (value) {
+                              return "₹" + value.toFixed(0);
+                          },
+                      },
+                      tickAmount: 7,
+                  }
+              };
+
+              // Clear existing chart
+              if (chartInstance) {
+                  chartInstance.destroy();
+              }
+
+              // Create new chart
+              chartInstance = new ApexCharts(
+                  document.getElementById("stockChart"),
+                  options
+              );
+              chartInstance.render();
+          }
+
+          // Function to filter data by range
+          function filterDataByRange(data, range) {
+              if (range === "ALL") return data;
+
+              const today = new Date();
+              let startDate;
+
+              switch (range) {
+                  case '1W':
+                      startDate = new Date(today);
+                      startDate.setDate(today.getDate() - 7);
+                      break;
+                  case '1M':
+                      startDate = new Date(today);
+                      startDate.setMonth(today.getMonth() - 1);
+                      break;
+                  case '3M':
+                      startDate = new Date(today);
+                      startDate.setMonth(today.getMonth() - 3);
+                      break;
+                  case '6M':
+                      startDate = new Date(today);
+                      startDate.setMonth(today.getMonth() - 6);
+                      break;
+                  case '1Y':
+                      startDate = new Date(today);
+                      startDate.setFullYear(today.getFullYear() - 1);
+                      break;
+                  default:
+                      return data;
+              }
+
+              const startDateStr = formatDate(startDate);
+              return data.filter(item => item.date >= startDateStr);
+          }
+
+          // Format date to YYYY-MM-DD
+          function formatDate(date) {
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+          }
+
+          // Function to format price
+          function formatPrice(price) {
+              return "₹" + parseFloat(price).toFixed(2);
+          }
+
+          // Function to populate historical data table
+          function populateHistoricalTable(data) {
+              const tableBody = document.getElementById('historicalDataTable');
+              tableBody.innerHTML = '';
+
+              // Take only the most recent data points
+              const recentData = data.slice(-10);
+
+              recentData.forEach(item => {
+                  const row = document.createElement('tr');
+                  row.innerHTML = `
+                      <td>${item.date}</td>
+                      <td>${formatPrice(item.open)}</td>
+                      <td>${formatPrice(item.high)}</td>
+                      <td>${formatPrice(item.low)}</td>
+                      <td>${formatPrice(item.close)}</td>
+                      <td>${item.volume.toLocaleString()}</td>
+                  `;
+                  tableBody.appendChild(row);
+              });
+          }
+
+          // Function to update the chart
+          async function updateChart() {
+              const data = await fetchHistoricalData(currentSymbol, currentTimeframe, currentRange);
+
+              if (currentChartType === "line") {
+                  renderLineChart(data, currentRange);
+              } else {
+                  renderCandleChart(data, currentRange);
+              }
+
+              // Update historical data table
+              populateHistoricalTable(data);
+          }
+
+          // Initialize chart
+          async function initChart() {
+              currentTimeframe = document.getElementById('timeframeSelect').value;
+              currentRange = document.querySelector('[data-range].active').dataset.range;
+
+              // Initial data fetch and chart rendering
+              await updateChart();
+
+              // Set up chart type toggle
+              document.getElementById('lineChartBtn').addEventListener('click', function () {
+                  this.classList.add('active');
+                  document.getElementById('candleChartBtn').classList.remove('active');
+                  currentChartType = "line";
+                  updateChart();
+              });
+
+              document.getElementById('candleChartBtn').addEventListener('click', function () {
+                  this.classList.add('active');
+                  document.getElementById('lineChartBtn').classList.remove('active');
+                  currentChartType = "candlestick";
+                  updateChart();
+              });
+
+              // Set up reset zoom button
+              document.getElementById('resetZoomBtn').addEventListener('click', function () {
+                  if (chartInstance) {
+                      chartInstance.resetSeries(false);
+                      chartInstance.zoomX(
+                          Math.min(...chartInstance.w.globals.dataPoints),
+                          Math.max(...chartInstance.w.globals.dataPoints)
+                      );
+                  }
+              });
+
+              // Set up timeframe selection
+              document.getElementById('timeframeSelect').addEventListener('change', function () {
+                  currentTimeframe = this.value;
+                  updateChart();
+              });
+
+              // Set up range buttons
+              document.querySelectorAll("[data-range]").forEach((button) => {
+                  button.addEventListener("click", function () {
+                      // Update active state
+                      document.querySelectorAll("[data-range]").forEach((btn) => {
+                          btn.classList.remove("active");
+                      });
+                      this.classList.add("active");
+
+                      // Update range and chart
+                      currentRange = this.dataset.range;
+                      updateChart();
+                  });
+              });
+          }
+
+          // Initialize the chart
+          initChart();
+      });
+    </script>
+  </body>
+</html>

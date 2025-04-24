@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - StockTokens</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  <style>
+    :root {
+      --chart-bg: #131722;
+      --chart-grid: #1e222d;
+      --chart-text: #d1d4dc;
+      --chart-border: #364156;
+      --chart-green: #26a69a;
+      --chart-red: #ef5350;
+      --chart-blue: #2962ff;
+      --chart-purple: #9c27b0;
+    }
+
+    /* TradingView-like chart container styles */
+    .tradingview-chart-container {
+      background-color: var(--chart-bg);
+      color: var(--chart-text);
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tradingview-chart {
+      height: 500px;
+      width: 100%;
+    }
+
+    .chart-toolbar {
+      border-bottom: 1px solid var(--chart-border);
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--chart-bg);
+    }
+
+    .chart-toolbar .btn {
+      color: var(--chart-text);
+      background-color: transparent;
+      border: none;
+      margin-right: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+
+    .chart-toolbar .btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .chart-toolbar .btn.active {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .timeframe-btn-group .btn {
+      font-weight: 600;
+      min-width: 28px;
+    }
+
+    .toolbar-dropdown {
+      background-color: var(--chart-bg);
+      color: var(--chart-text);
+      border: 1px solid var(--chart-border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    .toolbar-dropdown:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: var(--chart-blue);
+    }
+
+    .chart-tools {
+      display: flex;
+      align-items: center;
+    }
+
+    .chart-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .symbol-label {
+      font-weight: 600;
+      font-size: 16px;
+      margin-right: 12px;
+    }
+
+    .price-info {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      font-size: 14px;
+    }
+
+    .price-value {
+      margin-right: 8px;
+    }
+
+    .price-change {
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    .price-up {
+      background-color: rgba(38, 166, 154, 0.2);
+      color: var(--chart-green);
+    }
+
+    .price-down {
+      background-color: rgba(239, 83, 80, 0.2);
+      color: var(--chart-red);
+    }
+
+    .chart-loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(19, 23, 34, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      color: var(--chart-text);
+    }
+
+    .indicator-menu {
+      position: absolute;
+      top: 50px;
+      right: 12px;
+      background-color: var(--chart-bg);
+      border: 1px solid var(--chart-border);
+      border-radius: 4px;
+      padding: 8px 0;
+      z-index: 100;
+      width: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .indicator-menu.visible {
+      display: block;
+    }
+
+    .indicator-menu-item {
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .indicator-menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .indicator-group-title {
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9598a1;
+      text-transform: uppercase;
+    }
+
+    /* Drawing tools menu */
+    .drawing-menu {
+      position: absolute;
+      top: 50px;
+      right: 60px;
+      background-color: var(--chart-bg);
+      border: 1px solid var(--chart-border);
+      border-radius: 4px;
+      padding: 8px 0;
+      z-index: 100;
+      width: 180px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .drawing-menu.visible {
+      display: block;
+    }
+
+    .drawing-menu-item {
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+    }
+
+    .drawing-menu-item i {
+      margin-right: 8px;
+      width: 16px;
+      text-align: center;
+    }
+
+    .drawing-menu-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Custom ApexCharts styling */
+    #marketChart .apexcharts-canvas {
+      background-color: var(--chart-bg) !important;
+    }
+
+    #marketChart .apexcharts-xaxis text,
+    #marketChart .apexcharts-yaxis text {
+      fill: var(--chart-text) !important;
+    }
+
+    #marketChart .apexcharts-grid line {
+      stroke: var(--chart-grid) !important;
+    }
+
+    #marketChart .apexcharts-tooltip {
+      background-color: rgba(19, 23, 34, 0.9) !important;
+      color: var(--chart-text) !important;
+      border: 1px solid var(--chart-border) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    #marketChart .apexcharts-tooltip-title {
+      background-color: rgba(19, 23, 34, 0.8) !important;
+      border-bottom: 1px solid var(--chart-border) !important;
+    }
+
+    /* Volume panel styling */
+    .volume-panel {
+      height: 100px;
+      background-color: var(--chart-bg);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation remains unchanged -->
+
+  <!-- Main Content -->
+  <div class="container mt-4">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <!-- Market Chart - TradingView Style -->
+    <section class="mb-5">
+      <div class="card shadow-sm p-0 tradingview-chart-container">
+        <!-- Chart Toolbar -->
+        <div class="chart-toolbar">
+          <div class="chart-info">
+            <div class="symbol-label">NIFTY 50</div>
+            <div class="price-info">
+              <div class="price-value">₹{{ "{:.2f}".format(market_data.nifty.price) }}</div>
+              <div
+                class="price-change {% if market_data.nifty.change_percent > 0 %}price-up{% else %}price-down{% endif %}">
+                {{ "{:.2f}".format(market_data.nifty.change_percent) }}%
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-tools">
+            <!-- Chart Type -->
+            <select id="chartTypeSelect" class="toolbar-dropdown">
+              <option value="candlestick">Candlestick</option>
+              <option value="line">Line</option>
+              <option value="area">Area</option>
+              <option value="bar">Bar</option>
+              <option value="heikinashi">Heikin Ashi</option>
+            </select>
+
+            <!-- Timeframe Selection -->
+            <select id="timeframeSelect" class="toolbar-dropdown">
+              <option value="1min">1m</option>
+              <option value="5min">5m</option>
+              <option value="10min">10m</option>
+              <option value="15min">15m</option>
+              <option value="30min">30m</option>
+              <option value="60min">1h</option>
+              <option value="4h">4h</option>
+              <option value="1D" selected>1D</option>
+              <option value="1W">1W</option>
+            </select>
+
+            <!-- Time Range Buttons -->
+            <div class="timeframe-btn-group">
+              <button class="btn btn-sm active" data-range="1D">1D</button>
+              <button class="btn btn-sm" data-range="1W">1W</button>
+              <button class="btn btn-sm" data-range="1M">1M</button>
+              <button class="btn btn-sm" data-range="3M">3M</button>
+              <button class="btn btn-sm" data-range="6M">6M</button>
+              <button class="btn btn-sm" data-range="1Y">1Y</button>
+              <button class="btn btn-sm" data-range="ALL">ALL</button>
+            </div>
+
+            <!-- Technical Indicators Button -->
+            <button class="btn btn-sm" id="indicatorsBtn">
+              <i class="fa fa-chart-line"></i>
+            </button>
+
+            <!-- Drawing Tools Button -->
+            <button class="btn btn-sm" id="drawingToolsBtn">
+              <i class="fa fa-pencil-alt"></i>
+            </button>
+
+            <!-- Settings Button -->
+            <button class="btn btn-sm" id="chartSettingsBtn">
+              <i class="fa fa-cog"></i>
+            </button>
+
+            <!-- Full Screen Button -->
+            <button class="btn btn-sm" id="fullscreenBtn">
+              <i class="fa fa-expand"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Indicators Menu -->
+        <div class="indicator-menu" id="indicatorMenu">
+          <div class="indicator-group-title">Trend</div>
+          <div class="indicator-menu-item" data-indicator="sma">Moving Average (SMA)</div>
+          <div class="indicator-menu-item" data-indicator="ema">Exponential MA (EMA)</div>
+          <div class="indicator-menu-item" data-indicator="bollinger">Bollinger Bands</div>
+
+          <div class="indicator-group-title">Oscillators</div>
+          <div class="indicator-menu-item" data-indicator="rsi">Relative Strength Index (RSI)</div>
+          <div class="indicator-menu-item" data-indicator="macd">MACD</div>
+          <div class="indicator-menu-item" data-indicator="stochastic">Stochastic</div>
+
+          <div class="indicator-group-title">Volume</div>
+          <div class="indicator-menu-item" data-indicator="volume">Volume</div>
+          <div class="indicator-menu-item" data-indicator="obv">On Balance Volume (OBV)</div>
+        </div>
+
+        <!-- Drawing Tools Menu -->
+        <div class="drawing-menu" id="drawingMenu">
+          <div class="drawing-menu-item" data-tool="cursor">
+            <i class="fa fa-mouse-pointer"></i> Cursor
+          </div>
+          <div class="drawing-menu-item" data-tool="line">
+            <i class="fa fa-minus"></i> Line
+          </div>
+          <div class="drawing-menu-item" data-tool="horizontal">
+            <i class="fa fa-grip-lines"></i> Horizontal Line
+          </div>
+          <div class="drawing-menu-item" data-tool="vertical">
+            <i class="fa fa-grip-lines-vertical"></i> Vertical Line
+          </div>
+          <div class="drawing-menu-item" data-tool="trendline">
+            <i class="fa fa-chart-line"></i> Trend Line
+          </div>
+          <div class="drawing-menu-item" data-tool="fibonacci">
+            <i class="fa fa-project-diagram"></i> Fibonacci
+          </div>
+        </div>
+
+        <!-- Chart Container -->
+        <div class="tradingview-chart">
+          <div id="marketChart" style="height: 500px; width: 100%"></div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="chart-loading" id="chartLoading">
+          <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rest of the content remains unchanged -->
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let chartInstance = null;
+      let currentTimeframe = "1D";
+      let currentRange = "1D";
+      let currentSymbol = "^NSEI";
+      let currentChartType = "candlestick";
+      let activeIndicators = [];
+      let activeTool = "cursor";
+
+      // Show loading screen
+      function showLoading() {
+        document.getElementById('chartLoading').style.display = 'flex';
+      }
+
+      // Hide loading screen
+      function hideLoading() {
+        document.getElementById('chartLoading').style.display = 'none';
+      }
+
+      // Function to fetch historical data with timeframe
+      async function fetchHistoricalData(symbol, timeframe, range) {
+        showLoading();
+        try {
+          // In a real implementation, this would call your API
+          // For now, let's create some mockup data
+          const response = await new Promise(resolve => {
+            setTimeout(() => {
+              resolve({
+                ok: true,
+                json: () => Promise.resolve(generateMockData(timeframe, range))
+              });
+            }, 800); // Simulate network delay
+          });
+
+          const data = await response.json();
+          hideLoading();
+          return data;
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          hideLoading();
+          return [];
+        }
+      }
+
+      // Function to generate mock data
+      function generateMockData(timeframe, range) {
+        const data = [];
+        const now = new Date();
+        let startDate;
+
+        // Determine how far back to go based on range
+        switch (range) {
+          case '1D': startDate = new Date(now); startDate.setDate(now.getDate() - 1); break;
+          case '1W': startDate = new Date(now); startDate.setDate(now.getDate() - 7); break;
+          case '1M': startDate = new Date(now); startDate.setMonth(now.getMonth() - 1); break;
+          case '3M': startDate = new Date(now); startDate.setMonth(now.getMonth() - 3); break;
+          case '6M': startDate = new Date(now); startDate.setMonth(now.getMonth() - 6); break;
+          case '1Y': startDate = new Date(now); startDate.setFullYear(now.getFullYear() - 1); break;
+          case 'ALL': startDate = new Date(now); startDate.setFullYear(now.getFullYear() - 5); break;
+          default: startDate = new Date(now); startDate.setDate(now.getDate() - 30);
+        }
+
+        // Determine interval based on timeframe
+        let interval;
+        switch (timeframe) {
+          case '1min': interval = 60 * 1000; break;
+          case '5min': interval = 5 * 60 * 1000; break;
+          case '10min': interval = 10 * 60 * 1000; break;
+          case '15min': interval = 15 * 60 * 1000; break;
+          case '30min': interval = 30 * 60 * 1000; break;
+          case '60min': interval = 60 * 60 * 1000; break;
+          case '4h': interval = 4 * 60 * 60 * 1000; break;
+          case '1D': interval = 24 * 60 * 60 * 1000; break;
+          case '1W': interval = 7 * 24 * 60 * 60 * 1000; break;
+          default: interval = 24 * 60 * 60 * 1000;
+        }
+
+        // Generate mock OHLCV data
+        let basePrice = 19500; // Base price for Nifty 50
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= now) {
+          const open = basePrice + (Math.random() - 0.5) * 100;
+          const high = open + Math.random() * 50;
+          const low = open - Math.random() * 50;
+          const close = low + Math.random() * (high - low);
+          const volume = Math.floor(Math.random() * 10000000) + 5000000;
+
+          data.push({
+            date: currentDate.toISOString(),
+            open: open,
+            high: high,
+            low: low,
+            close: close,
+            volume: volume
+          });
+
+          // Adjust base price slightly for trend
+          basePrice = close;
+          currentDate = new Date(currentDate.getTime() + interval);
+        }
+
+        return data;
+      }
+
+      // Functions to format data for different chart types
+      function formatCandleData(data) {
+        return data.map(item => ({
+          x: new Date(item.date).getTime(),
+          y: [item.open, item.high, item.low, item.close]
+        }));
+      }
+
+      function formatLineData(data) {
+        return data.map(item => ({
+          x: new Date(item.date).getTime(),
+          y: item.close
+        }));
+      }
+
+      function formatAreaData(data) {
+        return data.map(item => ({
+          x: new Date(item.date).getTime(),
+          y: item.close
+        }));
+      }
+
+      function formatBarData(data) {
+        return data.map(item => ({
+          x: new Date(item.date).getTime(),
+          y: [item.open, item.high, item.low, item.close]
+        }));
+      }
+
+      function formatVolumeData(data) {
+        return data.map(item => ({
+          x: new Date(item.date).getTime(),
+          y: item.volume,
+          color: item.close >= item.open ? '#26a69a' : '#ef5350'
+        }));
+      }
+
+      // Format data for Heikin-Ashi
+      function formatHeikinAshiData(data) {
+        const haData = [];
+        let prevHA = null;
+
+        for (let i = 0; i < data.length; i++) {
+          const d = data[i];
+          let haOpen, haClose, haHigh, haLow;
+
+          if (prevHA === null) {
+            haOpen = (d.open + d.close) / 2;
+            haClose = (d.open + d.high + d.low + d.close) / 4;
+          } else {
+            haOpen = (prevHA.y[0] + prevHA.y[3]) / 2;
+            haClose = (d.open + d.high + d.low + d.close) / 4;
+          }
+
+          haHigh = Math.max(d.high, haOpen, haClose);
+          haLow = Math.min(d.low, haOpen, haClose);
+
+          const haPoint = {
+            x: new Date(d.date).getTime(),
+            y: [haOpen, haHigh, haLow, haClose]
+          };
+
+          haData.push(haPoint);
+          prevHA = haPoint;
+        }
+
+        return haData;
+      }
+
+      // Function to render chart with all features
+      function renderAdvancedChart(data) {
+        // Determine which data format to use based on chart type
+        let seriesData;
+
+        switch (currentChartType) {
+          case 'line':
+            seriesData = formatLineData(data);
+            break;
+          case 'area':
+            seriesData = formatAreaData(data);
+            break;
+          case 'bar':
+            seriesData = formatBarData(data);
+            break;
+          case 'heikinashi':
+            seriesData = formatHeikinAshiData(data);
+            break;
+          case 'candlestick':
+          default:
+            seriesData = formatCandleData(data);
+            break;
+        }
+
+        // Prepare volume data as a separate series
+        const volumeData = formatVolumeData(data);
+
+        // Basic chart options
+        const options = {
+          series: [
+            {
+              name: 'Price',
+              type: currentChartType === 'line' || currentChartType === 'area' ? currentChartType : 'candlestick',
+              data: seriesData
+            }
+          ],
+          chart: {
+            type: 'candlestick',
+            height: 400,
+            id: 'mainChart',
+            group: 'stock',
+            toolbar: {
+              show: true,
+              tools: {
+                download: true,
+                selection: true,
+                zoom: true,
+                zoomin: true,
+                zoomout: true,
+                pan: true,
+                reset: true
+              },
+              autoSelected: 'zoom'
+            },
+            animations: {
+              enabled: false
+            },
+            zoom: {
+              enabled: true,
+              type: 'xy',
+              autoScaleYaxis: true
+            },
+            background: '#131722'
+          },
+          plotOptions: {
+            candlestick: {
+              colors: {
+                upward: '#26a69a',
+                downward: '#ef5350'
+              },
+              wick: {
+                useFillColor: true
+              }
+            },
+            bar: {
+              colors: {
+                upward: '#26a69a',
+                downward: '#ef5350'
+              }
+            }
+          },
+          xaxis: {
+            type: 'datetime',
+            labels: {
+              datetimeUTC: false,
+              style: {
+                colors: '#d1d4dc'
+              }
+            },
+            axisBorder: {
+              show: false
+            },
+            axisTicks: {
+              show: false
+            }
+          },
+          yaxis: {
+            tickAmount: 8,
+            labels: {
+              formatter: function (value) {
+                return "₹" + value.toFixed(0);
+              },
+              style: {
+                colors: '#d1d4dc'
+              }
+            },
+            tooltip: {
+              enabled: true
+            }
+          },
+          grid: {
+            borderColor: '#1e222d',
+            strokeDashArray: 4,
+            position: 'back'
+          },
+          tooltip: {
+            enabled: true,
+            theme: 'dark',
+            x: {
+              format: 'MMM dd HH:mm'
+            }
+          },
+          crosshairs: {
+            stroke: {
+              color: '#9ca2af',
+              width: 1,
+              dashArray: 0
+            }
+          },
+          legend: {
+            show: false
+          },
+          responsive: [
+            {
+              breakpoint: 1000,
+              options: {
+                chart: {
+                  height: 350
+                }
+              }
+            }
+          ]
+        };
+
+        // Add volume panel if enabled
+        if (activeIndicators.includes('volume')) {
+          options.chart.height = 350;
+          options.chart.type = 'line';
+
+          // Create a synchronized volume chart
+          const volumeOptions = {
+            series: [{
+              name: 'Volume',
+              data: volumeData
+            }],
+            chart: {
+              height: 150,
+              type: 'bar',
+              brush: {
+                enabled: true,
+                target: 'mainChart'
+              },
+              selection: {
+                enabled: true
+              },
+              id: 'volumeChart',
+              group: 'stock',
+              background: '#131722'
+            },
+            colors: volumeData.map(d => d.color),
+            plotOptions: {
+              bar: {
+                columnWidth: '80%'
+              }
+            },
+            dataLabels: {
+              enabled: false
+            },
+            xaxis: {
+              type: 'datetime',
+              axisBorder: {
+                show: false
+              },
+              axisTicks: {
+                show: false
+              },
+              labels: {
+                show: false
+              }
+            },
+            yaxis: {
+              labels: {
+                show: true,
+                style: {
+                  colors: '#d1d4dc'
+                },
+                formatter: function (val) {
+                  return (val / 1000000).toFixed(1) + 'M';
+                }
+              }
+            },
+            grid: {
+              borderColor: '#1e222d',
+              strokeDashArray: 4
+            },
+            tooltip: {
+              theme: 'dark',
+              shared: true,
+              custom: function ({ series, seriesIndex, dataPointIndex }) {
+                return '<div class="p-2">' +
+                  '<span>Volume: ' + (series[seriesIndex][dataPointIndex] / 1000000).toFixed(2) + 'M</span>' +
+                  '</div>';
+              }
+            }
+          };
+
+          // Clear existing chart
+          if (chartInstance) {
+            chartInstance.destroy();
+          }
+
+          // Create main chart
+          chartInstance = new ApexCharts(
+            document.getElementById("marketChart"),
+            options
+          );
+          chartInstance.render();
+
+          // Create volume panel below main chart
+          const volumeDiv = document.createElement('div');
+          volumeDiv.id = 'volumeChart';
+          volumeDiv.className = 'volume-panel';
+          document.getElementById('marketChart').parentNode.appendChild(volumeDiv);
+
+          const volumeChart = new ApexCharts(
+            document.getElementById("volumeChart"),
+            volumeOptions
+          );
+          volumeChart.render();
+        } else {
+          // Clear existing chart
+          if (chartInstance) {
+            chartInstance.destroy();
+          }
+
+          // Remove volume panel if exists
+          const existingVolumePanel = document.getElementById('volumeChart');
+          if (existingVolumePanel) {
+            existingVolumePanel.remove();
+          }
+
+          // Create new chart
+          chartInstance = new ApexCharts(
+            document.getElementById("marketChart"),
+            options
+          );
+          chartInstance.render();
+        }
+
+        // Add technical indicators if enabled
+        if (activeIndicators.length > 0) {
+          // Implement technical indicators like SMA, RSI, etc.
+          if (activeIndicators.includes('sma')) {
+            addSMAIndicator(data, 20);  // 20-period SMA
+          }
+
+          if (activeIndicators.includes('ema')) {
+            addEMAIndicator(data, 14);  // 14-period EMA
+          }
+
+          if (activeIndicators.includes('bollinger')) {
+            addBollingerBands(data, 20, 2);  // 20-period, 2 standard deviations
+          }
+
+          if (activeIndicators.includes('rsi')) {
+            addRSIIndicator(data, 14);  // 14-period RSI
+          }
+        }
+      }
+
+      // Functions to add technical indicators
+      // Functions to add technical indicators
+      function addSMAIndicator(data, period) {
+        // Calculate Simple Moving Average
+        const smaData = [];
+
+        for (let i = 0; i < data.length; i++) {
+          if (i < period - 1) {
+            // Not enough data for SMA calculation yet
+            smaData.push({
+              x: new Date(data[i].date).getTime(),
+              y: null
+            });
+          } else {
+            // Calculate SMA
+            let sum = 0;
+            for (let j = 0; j < period; j++) {
+              sum += data[i - j].close;
+            }
+            const sma = sum / period;
+
+            smaData.push({
+              x: new Date(data[i].date).getTime(),
+              y: sma
+            });
+          }
+        }
+
+        // Add SMA to chart
+        chartInstance.appendSeries({
+          name: `SMA(${period})`,
+          type: 'line',
+          data: smaData,
+          color: '#2962ff'
+        });
+      }
+
+      function addEMAIndicator(data, period) {
+        // Calculate Exponential Moving Average
+        const emaData = [];
+        const multiplier = 2 / (period + 1);
+        let ema = data[0].close; // Initial EMA equals first price
+
+        for (let i = 0; i < data.length; i++) {
+          if (i === 0) {
+            // First EMA is the same as first price
+            emaData.push({
+              x: new Date(data[i].date).getTime(),
+              y: ema
+            });
+          } else {
+            // EMA = (Close - prevEMA) * multiplier + prevEMA
+            ema = (data[i].close - ema) * multiplier + ema;
+
+            emaData.push({
+              x: new Date(data[i].date).getTime(),
+              y: ema
+            });
+          }
+        }
+
+        // Add EMA to chart
+        chartInstance.appendSeries({
+          name: `EMA(${period})`,
+          type: 'line',
+          data: emaData,
+          color: '#9c27b0'
+        });
+      }
+
+      function addBollingerBands(data, period, stdDev) {
+        const upperBandData = [];
+        const middleBandData = [];
+        const lowerBandData = [];
+
+        for (let i = 0; i < data.length; i++) {
+          if (i < period - 1) {
+            // Not enough data yet
+            upperBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: null
+            });
+            middleBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: null
+            });
+            lowerBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: null
+            });
+          } else {
+            // Calculate SMA (middle band)
+            let sum = 0;
+            for (let j = 0; j < period; j++) {
+              sum += data[i - j].close;
+            }
+            const sma = sum / period;
+
+            // Calculate Standard Deviation
+            let sumSquaredDiff = 0;
+            for (let j = 0; j < period; j++) {
+              sumSquaredDiff += Math.pow(data[i - j].close - sma, 2);
+            }
+            const standardDeviation = Math.sqrt(sumSquaredDiff / period);
+
+            // Calculate Bands
+            const upperBand = sma + (standardDeviation * stdDev);
+            const lowerBand = sma - (standardDeviation * stdDev);
+
+            upperBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: upperBand
+            });
+            middleBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: sma
+            });
+            lowerBandData.push({
+              x: new Date(data[i].date).getTime(),
+              y: lowerBand
+            });
+          }
+        }
+
+        // Add Bollinger Bands to chart
+        chartInstance.appendSeries({
+          name: `Upper Band (${period}, ${stdDev})`,
+          type: 'line',
+          data: upperBandData,
+          color: '#7B1FA2',
+          opacity: 0.4,
+          dashArray: 5
+        });
+
+        chartInstance.appendSeries({
+          name: `Middle Band (${period})`,
+          type: 'line',
+          data: middleBandData,
+          color: '#9C27B0',
+          dashArray: 0
+        });
+
+        chartInstance.appendSeries({
+          name: `Lower Band (${period}, ${stdDev})`,
+          type: 'line',
+          data: lowerBandData,
+          color: '#7B1FA2',
+          opacity: 0.4,
+          dashArray: 5
+        });
+      }
+
+      function addRSIIndicator(data, period) {
+        // Create a separate panel for RSI
+        const rsiData = calculateRSI(data, period);
+
+        // Create RSI panel below main chart
+        const rsiDiv = document.createElement('div');
+        rsiDiv.id = 'rsiChart';
+        rsiDiv.className = 'volume-panel';
+        document.getElementById('marketChart').parentNode.appendChild(rsiDiv);
+
+        const rsiOptions = {
+          series: [{
+            name: 'RSI',
+            data: rsiData
+          }],
+          chart: {
+            height: 150,
+            type: 'line',
+            brush: {
+              enabled: true,
+              target: 'mainChart'
+            },
+            selection: {
+              enabled: true
+            },
+            id: 'rsiChart',
+            group: 'stock',
+            background: '#131722'
+          },
+          stroke: {
+            curve: 'smooth',
+            width: 2
+          },
+          colors: ['#FF9800'],
+          xaxis: {
+            type: 'datetime',
+            axisBorder: {
+              show: false
+            },
+            axisTicks: {
+              show: false
+            },
+            labels: {
+              show: false
+            }
+          },
+          yaxis: {
+            min: 0,
+            max: 100,
+            tickAmount: 3,
+            labels: {
+              style: {
+                colors: '#d1d4dc'
+              }
+            }
+          },
+          grid: {
+            borderColor: '#1e222d',
+            strokeDashArray: 4
+          },
+          tooltip: {
+            theme: 'dark',
+            shared: true
+          },
+          annotations: {
+            yaxis: [
+              {
+                y: 70,
+                borderColor: '#FF5252',
+                label: {
+                  text: 'Overbought',
+                  style: {
+                    color: '#d1d4dc',
+                    background: '#1e222d'
+                  }
+                }
+              },
+              {
+                y: 30,
+                borderColor: '#4CAF50',
+                label: {
+                  text: 'Oversold',
+                  style: {
+                    color: '#d1d4dc',
+                    background: '#1e222d'
+                  }
+                }
+              }
+            ]
+          }
+        };
+
+        const rsiChart = new ApexCharts(
+          document.getElementById("rsiChart"),
+          rsiOptions
+        );
+        rsiChart.render();
+      }
+
+      function calculateRSI(data, period) {
+        const rsi = [];
+        let gains = 0;
+        let losses = 0;
+
+        for (let i = 0; i < data.length; i++) {
+          if (i === 0) {
+            rsi.push({
+              x: new Date(data[i].date).getTime(),
+              y: null
+            });
+            continue;
+          }
+
+          const change = data[i].close - data[i - 1].close;
+
+          if (i <= period) {
+            // First period - accumulate gains and losses
+            if (change > 0) {
+              gains += change;
+            } else {
+              losses -= change;
+            }
+
+            if (i === period) {
+              const avgGain = gains / period;
+              const avgLoss = losses / period;
+              const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+              const rsiValue = 100 - (100 / (1 + rs));
+
+              rsi.push({
+                x: new Date(data[i].date).getTime(),
+                y: rsiValue
+              });
+            } else {
+              rsi.push({
+                x: new Date(data[i].date).getTime(),
+                y: null
+              });
+            }
+          } else {
+            // Use smoothed method for subsequent calculations
+            const prevGain = (rsi[i - 1].y >= 50) ?
+              ((period - 1) * gains / period) : 0;
+            const prevLoss = (rsi[i - 1].y < 50) ?
+              ((period - 1) * losses / period) : 0;
+
+            const currentGain = change > 0 ? change : 0;
+            const currentLoss = change < 0 ? -change : 0;
+
+            // Calculate smoothed values
+            const smoothedGain = ((period - 1) * prevGain + currentGain) / period;
+            const smoothedLoss = ((period - 1) * prevLoss + currentLoss) / period;
+
+            const rs = smoothedLoss === 0 ? 100 : smoothedGain / smoothedLoss;
+            const rsiValue = 100 - (100 / (1 + rs));
+
+            rsi.push({
+              x: new Date(data[i].date).getTime(),
+              y: rsiValue
+            });
+
+            gains = smoothedGain;
+            losses = smoothedLoss;
+          }
+        }
+
+        return rsi;
+      }
+
+      function addMACDIndicator(data) {
+        // MACD implementation would go here
+        // This would be similar to RSI but with different calculation
+      }
+
+      // Function to toggle indicator menu
+      document.getElementById('indicatorsBtn').addEventListener('click', function () {
+        const menu = document.getElementById('indicatorMenu');
+        menu.classList.toggle('visible');
+        document.getElementById('drawingMenu').classList.remove('visible'); // Hide drawing menu if open
+      });
+
+      // Function to toggle drawing tools menu
+      document.getElementById('drawingToolsBtn').addEventListener('click', function () {
+        const menu = document.getElementById('drawingMenu');
+        menu.classList.toggle('visible');
+        document.getElementById('indicatorMenu').classList.remove('visible'); // Hide indicator menu if open
+      });
+
+      // Handle indicator selection
+      document.querySelectorAll('.indicator-menu-item').forEach(item => {
+        item.addEventListener('click', function () {
+          const indicator = this.getAttribute('data-indicator');
+
+          // Toggle indicator in active list
+          const index = activeIndicators.indexOf(indicator);
+          if (index === -1) {
+            activeIndicators.push(indicator);
+            this.classList.add('active');
+          } else {
+            activeIndicators.splice(index, 1);
+            this.classList.remove('active');
+          }
+
+          // Update chart with selected indicators
+          updateChart();
+
+          // Hide menu after selection
+          document.getElementById('indicatorMenu').classList.remove('visible');
+        });
+      });
+
+      // Handle drawing tool selection
+      document.querySelectorAll('.drawing-menu-item').forEach(item => {
+        item.addEventListener('click', function () {
+          const tool = this.getAttribute('data-tool');
+          activeTool = tool;
+
+          // Update active class
+          document.querySelectorAll('.drawing-menu-item').forEach(el => {
+            el.classList.remove('active');
+          });
+          this.classList.add('active');
+
+          // Hide menu after selection
+          document.getElementById('drawingMenu').classList.remove('visible');
+
+          // Implement drawing logic for the selected tool
+          // This would require more complex interaction with the chart
+        });
+      });
+
+      // Chart Type Selection
+      document.getElementById('chartTypeSelect').addEventListener('change', function () {
+        currentChartType = this.value;
+        updateChart();
+      });
+
+      // Timeframe Selection
+      document.getElementById('timeframeSelect').addEventListener('change', function () {
+        currentTimeframe = this.value;
+        updateChart();
+      });
+
+      // Time Range Buttons
+      document.querySelectorAll('.timeframe-btn-group .btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          // Update active class
+          document.querySelectorAll('.timeframe-btn-group .btn').forEach(el => {
+            el.classList.remove('active');
+          });
+          this.classList.add('active');
+
+          // Set current range
+          currentRange = this.getAttribute('data-range');
+          updateChart();
+        });
+      });
+
+      // Fullscreen toggle
+      document.getElementById('fullscreenBtn').addEventListener('click', function () {
+        const chartContainer = document.querySelector('.tradingview-chart-container');
+
+        if (!document.fullscreenElement) {
+          if (chartContainer.requestFullscreen) {
+            chartContainer.requestFullscreen();
+          } else if (chartContainer.mozRequestFullScreen) {
+            chartContainer.mozRequestFullScreen();
+          } else if (chartContainer.webkitRequestFullscreen) {
+            chartContainer.webkitRequestFullscreen();
+          } else if (chartContainer.msRequestFullscreen) {
+            chartContainer.msRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          }
+        }
+      });
+
+      // Function to update chart based on current settings
+      async function updateChart() {
+        const data = await fetchHistoricalData(currentSymbol, currentTimeframe, currentRange);
+        renderAdvancedChart(data);
+      }
+
+      // Initialize chart on page load
+      updateChart();
+
+      // Click outside menus to close them
+      document.addEventListener('click', function (event) {
+        const indicatorMenu = document.getElementById('indicatorMenu');
+        const drawingMenu = document.getElementById('drawingMenu');
+        const indicatorBtn = document.getElementById('indicatorsBtn');
+        const drawingBtn = document.getElementById('drawingToolsBtn');
+
+        if (!indicatorMenu.contains(event.target) && event.target !== indicatorBtn) {
+          indicatorMenu.classList.remove('visible');
+        }
+
+        if (!drawingMenu.contains(event.target) && event.target !== drawingBtn) {
+          drawingMenu.classList.remove('visible');
+        }
+      });
+
+      // Settings button functionality
+      document.getElementById('chartSettingsBtn').addEventListener('click', function () {
+        // Implement settings modal or panel
+        alert('Chart settings to be implemented');
+      });
+
+      // Implement other UI interactions and chart functionality
+    });
+  </script>
+  </body>
+  </html>
