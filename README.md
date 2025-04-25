@@ -37,12 +37,7 @@ TokenVest democratizes investing by tokenizing stocks from the National Stock Ex
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Create a config file (`config.py`):
+3. Create a config file (`config.py`):
    ```python
    class Config:
        SECRET_KEY = 'your-secret-key'
@@ -50,20 +45,19 @@ TokenVest democratizes investing by tokenizing stocks from the National Stock Ex
        SQLALCHEMY_TRACK_MODIFICATIONS = False
    ```
 
-5. Initialize the database:
+4. Initialize the database:
    ```
    flask shell
    >>> from app import db
    >>> db.create_all()
    >>> exit()
    ```
-
-6. Run the application:
+5. Run the application:
    ```
    python app.py
    ```
 
-7. Access the platform at http://localhost:9000
+6. Access the platform at http://localhost:9000
 
 ## 📊 How It Works
 
