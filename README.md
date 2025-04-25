@@ -82,12 +82,6 @@ TokenVest democratizes investing by tokenizing stocks from the National Stock Ex
 5. **Monitor**: Track portfolio performance on the dashboard
 6. **Sell**: Liquidate tokens when desired
 
-## 📷 Screenshots
-
-![Dashboard](https://placehold.co/800x400?text=Dashboard)
-![Stock Detail](https://placehold.co/800x400?text=Stock+Detail)
-![Portfolio](https://placehold.co/800x400?text=Portfolio)
-
 ## 📋 Project Structure
 
 ```
